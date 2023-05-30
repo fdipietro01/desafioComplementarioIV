@@ -32,7 +32,11 @@ class UserManager {
   }
   async updateUser(email, password) {
     try {
-      await this.model.findOneAndUpdate({ email }, { password });
+      const updated = await this.model.findOneAndUpdate(
+        { email },
+        { password }
+      );
+      return updated;
     } catch (err) {
       throw new Error("Error al actualizar credenciales de usuario", err);
     }

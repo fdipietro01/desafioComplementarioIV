@@ -15,7 +15,7 @@ class UserService {
     return response;
   }
   async updateUser(email, password) {
-    const response = await this.dao.updateUser(email);
+    const response = await this.dao.updateUser(email, password);
     return response;
   }
 }

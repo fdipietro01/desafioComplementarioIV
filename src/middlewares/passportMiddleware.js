@@ -11,7 +11,7 @@ const cookieExtractor = (req) => {
   if (req && req.cookies) {
     token = req.cookies[cookieField];
   }
-  logger.info(token);
+  logger.info(`token:${token}`);
   return token;
 };
 

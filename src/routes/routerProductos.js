@@ -11,21 +11,21 @@ routerProductos.get("/:pid", productController.getProductById);
 routerProductos.post(
   "/",
   passportAutenticate("current"),
-  passportAuthorize("Admin"),
+  passportAuthorize(["Admin", "Premium"]),
   productController.addProduct
 );
 
 routerProductos.put(
   "/:pid",
   passportAutenticate("current"),
-  passportAuthorize("Admin"),
+  passportAuthorize(["Admin", "Premium"]),
   productController.editProduct
 );
 
 routerProductos.delete(
   "/:pid",
   passportAutenticate("current"),
-  passportAuthorize("Admin"),
+  passportAuthorize(["Admin", "Premium"]),
   productController.deleteProduct
 );
 

@@ -1,4 +1,5 @@
 const { validatePassword, cryptPass } = require("../utils/bcrypt");
+const sendMail = require("../utils/sendMail");
 const { generateToken } = require("../utils/token");
 const { Session } = require("../service/index");
 const LoginUserDto = require("../dtos/currentUserDto");
@@ -22,7 +23,6 @@ class SessionControler {
         httpOnly: true,
       });
       if (!token) res.status(400).send({ message: "Error al loguear" });
-
       res.status(200).send({ message: "Logueado exitosamente", user, token });
     } catch (err) {
       res.status(400).send({ message: "Error al loguear" });
@@ -30,7 +30,16 @@ class SessionControler {
   }
 
   async register(req, res) {
-    const { email, password, nombre, apellido, edad, avatar, fecha } = req.body;
+    const {
+      email,
+      password,
+      nombre,
+      apellido,
+      edad,
+      avatar,
+      fecha,
+      isPremium = false,
+    } = req.body;
     if (
       !email ||
       !password ||
@@ -48,7 +57,11 @@ class SessionControler {
         message: "Usuario ya registrado",
       });
     }
-    let isAdmin = email === adminEmail && password === adminPassword;
+    const role = isPremium
+      ? "Premium"
+      : email === adminEmail && password === adminPassword
+      ? "Admin"
+      : "User";
     const user = {
       nombre,
       apellido,
@@ -56,7 +69,7 @@ class SessionControler {
       password: cryptPass(password),
       edad,
       avatar,
-      role: isAdmin ? "Admin" : "User",
+      role,
       fecha,
     };
     try {
@@ -71,24 +84,84 @@ class SessionControler {
     }
   }
 
+  async reloginPetition(req, res) {
+    try {
+      const { mail } = req.body;
+      if (!mail)
+        return res.status(400)({
+          status: "Error",
+          message: "Completar todos los campos",
+        });
+      const user = await Session.getUser(mail);
+      if (!user) {
+        req.logger.warning("Fue el caso");
+        return res.status(400).send({
+          status: "Error",
+          message: "Email no registrado",
+        });
+      }
+      const mailContentConfig = {
+        promotor: `Servicio de reset contraseña`,
+        userMail: mail,
+        subject: "Reinicio de contraseña",
+        html: `
+          <div>
+            <h2>
+              ${user.nombre} ${user.apellido} has solicitado cambiar tu contraseña
+            </h2>
+            <a href= http://localhost:5173/relogin>
+              <button>Generar nueva contraseña</button>
+            </a>
+            <p>
+              Si no has solicitado el cambio de contraseña, desestima este mail
+            </p>
+          </div>
+          `,
+      };
+      await sendMail(mailContentConfig);
+
+      return res.status(200).send({
+        status: "success",
+        message: "Se ha enviado un correo con instrucciones a su casilla",
+      });
+    } catch (err) {
+      return res.status(400).send({
+        status: "Error",
+        message: `Error al solictar actualización de password`,
+      });
+    }
+  }
+
   async relogin(req, res) {
-    const { mail, pass } = req.body;
-    if (!mail || !pass)
-      return res.send({
-        status: 404,
-        message: "Completar todos los campos",
-      });
-    const user = await Session.getUser(mail);
-    if (!user)
-      return res.send({
-        status: 404,
-        message: "Email no registrado",
-      });
-    else {
-      await Session.updateUser(mail, cryptPass(pass));
-      res.send({
-        success: 200,
-        message: `${user.nombre} ${user.apellido} has actualizado tu contraseña exitosamente`,
+    try {
+      const { mail, password } = req.body;
+      if (!mail || !password)
+        return res.send({
+          status: 404,
+          message: "Completar todos los campos",
+        });
+      const user = await Session.getUser(mail);
+      if (!user)
+        return res.send({
+          status: 404,
+          message: "Email no registrado",
+        });
+      const parsedPass = password.toString();
+      if (validatePassword(user, parsedPass))
+        return res.status(400).send({
+          message:
+            "La contraseña introducida coincide con la contraseña actual",
+        });
+      const result = await Session.updateUser(mail, cryptPass(parsedPass));
+      if (result) {
+        res.send({
+          success: 200,
+          message: `${user.nombre} ${user.apellido} has actualizado tu contraseña exitosamente.`,
+        });
+      } else return res.send({ message: "Error al actualizar contraseña" });
+    } catch (err) {
+      return res.status(400).send({
+        message: `Error al actualizar intente nuevamente`,
       });
     }
   }

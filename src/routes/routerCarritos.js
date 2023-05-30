@@ -8,40 +8,40 @@ const carritoRouter = Router();
 carritoRouter.post(
   "/",
   passportAutenticate("current"),
-  passportAuthorize("User"),
+  passportAuthorize(["User"]),
   cartController.crearCarrito
 );
 
 carritoRouter.get(
   "/:cid",
   passportAutenticate("current"),
-  passportAuthorize("User"),
+  passportAuthorize(["User"]),
   cartController.getProductsFromCart
 );
 
 carritoRouter.post(
   "/update",
   passportAutenticate("current"),
-  passportAuthorize("User"),
+  passportAuthorize(["User"]),
   cartController.updateProductQuantityFromCart
 );
 carritoRouter.delete(
   "/:cid",
   passportAutenticate("current"),
-  passportAuthorize("User"),
+  passportAuthorize(["User"]),
   cartController.deleteCart
 );
 
 carritoRouter.post(
   "/:cid/purchase",
   passportAutenticate("current"),
-  passportAuthorize("User"),
+  passportAuthorize(["User"]),
   cartController.purchase
 );
 carritoRouter.delete(
   "/:cid/:pid",
   passportAutenticate("current"),
-  passportAuthorize("User"),
+  passportAuthorize(["User"]),
   cartController.deleteSingleProduct
 );
 

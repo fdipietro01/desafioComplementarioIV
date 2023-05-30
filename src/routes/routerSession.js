@@ -18,6 +18,7 @@ sessionsRouter.post(
   sessionController.register
 );
 
+sessionsRouter.post("/reloginPetittion", sessionController.reloginPetition);
 sessionsRouter.post("/relogin", sessionController.relogin);
 
 sessionsRouter.get(

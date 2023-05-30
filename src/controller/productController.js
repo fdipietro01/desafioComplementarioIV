@@ -42,6 +42,7 @@ class ProductController {
       code,
       thumbnail,
       status,
+      owner,
     } = req.body;
     try {
       if (
@@ -71,11 +72,19 @@ class ProductController {
     }
   }
   async editProduct(req, res) {
-    const { pid } = req.params;
-    const newProd = req.body;
-    if (Object.keys(newProd).length === 0)
-      return res.status(400).send("Enviar producto a actualizar");
     try {
+      const newProd = req.body;
+      const { pid } = req.params;
+      const { role, email } = req.user;
+      const prod = await Product.getProductById(pid);
+      if (role === "Premium" && prod.owner !== email) {
+        return res.status(400).json({
+          message:
+            "No tiene permisos para editar este producto, solo productos propios",
+        });
+      }
+      if (Object.keys(newProd).length === 0)
+        return res.status(400).send("Enviar producto a actualizar");
       await Product.updateProduct(pid, newProd);
       res.status(200).json({ actualizado: "success" });
     } catch (err) {
@@ -85,6 +94,14 @@ class ProductController {
   async deleteProduct(req, res) {
     const { pid } = req.params;
     try {
+      const prod = await Product.getProductById(pid);
+      const { role, email } = req.user;
+      if (role === "Premium" && prod.owner !== email) {
+        return res.status(400).json({
+          message:
+            "No tiene permisos para eliminar este producto, solo productos propios",
+        });
+      }
       const deleted = await Product.deleteProduct(pid);
       if (deleted !== 0) res.status(200).json({ status: "succes" });
       else

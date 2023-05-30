@@ -7,7 +7,10 @@ class ProductManager {
   }
   addProduct = async (producto) => {
     try {
-      await this.model.create(producto);
+      await this.model.create({
+        ...producto,
+        owner: producto.owner ?? "Admin",
+      });
     } catch (err) {
       req.logger.error(err);
       throw new Error("Error al grabar el producto", err);

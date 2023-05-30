@@ -1,11 +1,9 @@
 const MongoStore = require("connect-mongo");
 const MongoSingleton = require("../daos/mongoDaos/MongoSingleton");
 const program = require("../../process");
-const {
-  TrustProductsChannelEndpointAssignmentContextImpl,
-} = require("twilio/lib/rest/trusthub/v1/trustProducts/trustProductsChannelEndpointAssignment");
 
 const { mode } = program.opts();
+
 require("dotenv").config({
   path: mode === "DEVELOPMENT" ? "./.env.development" : "./.env.production",
 });
@@ -30,8 +28,8 @@ const config = {
     saveUnitialized: false,
   },
   mailing: {
-    testUser: process.env.TEST_MAIL_USER,
-    testPassword: process.env.TEST_MAIL_PASS,
+    testUser: process.env.MAIL_USER,
+    testPassword: process.env.MAIL_PASS,
     twilioSid: process.env.TWILIO_ACCOUNT_SID,
     twilioToken: process.env.TWILIO_AUTH_TOKEN,
     twilioPhone: process.env.TWILIO_PHONE,

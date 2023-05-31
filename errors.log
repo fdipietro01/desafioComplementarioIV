@@ -14,3 +14,6 @@ error: undefined
 error: Cannot set headers after they are sent to the client
 error: Producto no encontrado
 error: undefined
+error: undefined {"cause":"One or more product properties were incomplete or not valid.\n    List of requieed properties:\n    *title: needs to be a string, recived Juan F. Quintero\n    *category: needs to be one of [arqueros, defensores, centrocampistas, delanteros], recived De\n    *description: needs to be a string, recived undefined\n    *code: needs to be a number, recived undefined\n    *stock: needs to be a number, recived undefined\n    *status: needs to be a string, recived undefined\n    *thumbnail: needs to be a string, recived undefined","code":2,"name":"Error al crear producto"}
+error: undefined {"cause":"One or more product properties were incomplete or not valid.\n    List of requieed properties:\n    *title: needs to be a string, recived Juan F. Quintero\n    *category: needs to be one of [arqueros, defensores, centrocampistas, delanteros], recived Delan\n    *description: needs to be a string, recived undefined\n    *code: needs to be a number, recived undefined\n    *stock: needs to be a number, recived undefined\n    *status: needs to be a string, recived undefined\n    *thumbnail: needs to be a string, recived undefined","code":2,"name":"Error al crear producto"}
+error: undefined

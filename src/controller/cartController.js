@@ -28,6 +28,15 @@ class CartController {
           cause: createEditCartErrorInfo(req.body),
           code: Errors.PARAM_ERROR,
         });
+      const { role, email } = req.user;
+      const prod = await Product.getProductById(pid);
+      if (role === "Premium" && prod.owner === email) {
+        return res.status(400).json({
+          message:
+            "Los usuarios con membresía premium no pueden comprar artículos creados por sí mismos",
+        });
+      }
+
       await Cart.updateProductQuantityFromCart(cid, pid, quantity);
       res.status(200).send({ status: "success" });
     } catch (err) {

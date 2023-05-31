@@ -19,6 +19,7 @@ sessionsRouter.post(
 );
 
 sessionsRouter.post("/reloginPetittion", sessionController.reloginPetition);
+sessionsRouter.get("/reset-password/:token", sessionController.reloginCheck);
 sessionsRouter.post("/relogin", sessionController.relogin);
 
 sessionsRouter.get(

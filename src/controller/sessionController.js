@@ -1,10 +1,10 @@
 const { validatePassword, cryptPass } = require("../utils/bcrypt");
 const sendMail = require("../utils/sendMail");
-const { generateToken } = require("../utils/token");
+const { generateToken, mailingVerifyToken } = require("../utils/token");
 const { Session } = require("../service/index");
 const LoginUserDto = require("../dtos/currentUserDto");
 const CurrentUserDto = require("../dtos/currentUserDto");
-const { jwt, adminEmail, adminPassword } = require("../config/config");
+const { jwt, adminEmail, adminPassword, port } = require("../config/config");
 
 class SessionControler {
   async login(req, res) {
@@ -100,6 +100,7 @@ class SessionControler {
           message: "Email no registrado",
         });
       }
+      const token = generateToken(user, "1h");
       const mailContentConfig = {
         promotor: `Servicio de reset contraseña`,
         userMail: mail,
@@ -109,7 +110,7 @@ class SessionControler {
             <h2>
               ${user.nombre} ${user.apellido} has solicitado cambiar tu contraseña
             </h2>
-            <a href= http://localhost:5173/relogin>
+            <a href= http://localhost:${port}/sessions/reset-password/${token}>
               <button>Generar nueva contraseña</button>
             </a>
             <p>
@@ -132,6 +133,20 @@ class SessionControler {
     }
   }
 
+  async reloginCheck(req, res) {
+    try {
+      const { token } = req.params;
+      if (!token)
+        return res.status(200).redirect(`http://localhost:5173/reloginError`);
+      const isValid = mailingVerifyToken(token);
+      isValid
+        ? res.status(200).redirect(`http://localhost:5173/relogin`)
+        : res.status(400).redirect(`http://localhost:5173/reloginError`);
+    } catch (err) {
+      req.logger.error(`Reset-password token error`);
+      res.status(200).redirect(`http://localhost:5173/reloginError`);
+    }
+  }
   async relogin(req, res) {
     try {
       const { mail, password } = req.body;

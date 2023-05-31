@@ -26,6 +26,10 @@ class UserService {
     const usuario = await this.dao.updateUserTicket(uid, tid);
     return usuario;
   }
+  async updateUserRole(uid, role) {
+    const usuario = await this.dao.updateUserRole(uid, role);
+    return usuario;
+  }
 }
 
 module.exports = UserService;

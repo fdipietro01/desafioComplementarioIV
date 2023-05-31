@@ -41,6 +41,18 @@ class UserManager {
       throw new Error("Error al actualizar credenciales de usuario", err);
     }
   }
+  async updateUserRole(uid, role) {
+    try {
+      const updated = await this.model.findOneAndUpdate(
+        { _id: new Types.ObjectId(uid) },
+        { role },
+        { new: true }
+      );
+      return updated;
+    } catch (err) {
+      throw new Error("Error al actualizar role de usuario", err);
+    }
+  }
 
   async updateUserCart(id, cid) {
     try {

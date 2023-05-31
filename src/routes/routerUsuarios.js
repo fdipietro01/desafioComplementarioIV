@@ -1,6 +1,7 @@
 const { Router } = require("express");
 const usersController = require("../controller/usersController");
 const passportAutenticate = require("../middlewares/passportAutenticate");
+const passportAuthorize = require("../middlewares/passportAuthorize");
 
 const routerUsuarios = Router();
 
@@ -9,15 +10,15 @@ routerUsuarios.get(
   passportAutenticate("current"),
   usersController.getUsers
 );
-
 routerUsuarios.put(
-  "/:uid/:cid",
+  "/premium/:uid",
   passportAutenticate("current"),
-  usersController.updateUserCart
+  passportAuthorize(["User", "Premium"]),
+  usersController.toogleUserRole
 );
 
 routerUsuarios.put(
-  "/:uid/:tid",
+  "/:uid/:cid",
   passportAutenticate("current"),
   usersController.updateUserCart
 );

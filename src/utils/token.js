@@ -2,8 +2,8 @@ const jwt = require("jsonwebtoken");
 const { jwt_secret } = require("../config/config");
 
 const privateSign = jwt_secret;
-const generateToken = (user) => {
-  const token = jwt.sign(user, privateSign, { expiresIn: "12h" });
+const generateToken = (user, time = "4h") => {
+  const token = jwt.sign(user, privateSign, { expiresIn: time });
   return token;
 };
 
@@ -19,4 +19,11 @@ const verifyToken = (req, res, next) => {
   });
 };
 
-module.exports = { generateToken, verifyToken };
+const mailingVerifyToken = (token) => {
+  let validToken;
+  jwt.verify(token, privateSign, (err, credentials) => {
+    validToken = !err && credentials;
+  });
+  return validToken;
+};
+module.exports = { generateToken, verifyToken, mailingVerifyToken };
